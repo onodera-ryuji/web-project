@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <!--
+      * <springProfile name=""> は
+      * src/main/resources/application.properties の、
+      * spring.profiles.active= を参照しています。
+      *
+      * local、development、production とで、
+      * ログファイルの出力先や、ログレベルの閾値(DEBUG,INFO,WARN,ERROR)を変更します。
+      -->
+
+    <!-- ローカル -->
+    <springProfile name="local" >
+        <property name="LOG_FILE" value="/home/ec2-user/workspace/web-project/log/local.log" />
+    </springProfile>
+
+    <!-- 開発環境 -->
+    <springProfile name="development" >
+        <property name="LOG_FILE" value="/var/lib/tomcats/INST1/logs/development.log" />
+    </springProfile>
+
+    <!-- 本番環境 -->
+    <springProfile name="production" >
+        <property name="LOG_FILE" value="/var/lib/tomcats/INST1/logs/production.log" />
+    </springProfile>
+
+    <!-- ログファイル出力と、ログローテートの設定 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <file>${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+          <fileNamePattern>${LOG_FILE}.%d{yyyyMMdd}</fileNamePattern>
+            <!-- 5世代保持 -->
+            <maxHistory>5</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- ローカル -->
+    <springProfile name="local" >
+        <root level="DEBUG">
+            <!-- <appender-ref ref="CONSOLE"/> -->
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+
+    <!-- 開発環境 -->
+    <springProfile name="development" >
+        <root level="INFO">
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+
+    <!-- 本番環境 -->
+    <springProfile name="production" >
+        <root level="WARN">
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+</configuration>
